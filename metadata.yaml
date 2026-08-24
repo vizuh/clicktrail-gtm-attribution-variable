@@ -1,7 +1,6 @@
 homepage: "https://github.com/vizuh/clicktrail-gtm-attribution-variable"
 documentation: "https://github.com/vizuh/clicktrail-gtm-attribution-variable#readme"
 versions:
-  # Version 1 - replace "sha" with the commit SHA of this version before
-  # submitting to the Community Template Gallery (git rev-parse HEAD).
-  - sha: 0000000000000000000000000000000000000000
+  # Version 1
+  - sha: c65c2fcfc50704c87d9178ce5f34347284a5a2b1
     changeNotes: Initial release.
