@@ -1,0 +1,55 @@
+name: GTM Gallery Status
+
+on:
+  schedule:
+    - cron: "0 6 * * 2,5"
+  workflow_dispatch:
+
+jobs:
+  gallery-status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check GTM gallery listing status
+        id: gallery
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://tagmanager.google.com/api/gallery/owners/vizuh/templates/${{ github.event.repository.name }}")
+          echo "http=$STATUS" >> "$GITHUB_OUTPUT"
+
+      - name: Update README badge
+        env:
+          HTTP: ${{ steps.gallery.outputs.http }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ "$HTTP" = "200" ]; then
+            LINE="### GTM Gallery Status"$'\n'"🟢 [Listed](https://tagmanager.google.com/gallery/#/owners/vizuh/templates/$REPO)"
+          else
+            LINE="### GTM Gallery Status"$'\n'"⚪ Not listed yet"
+          fi
+          python3 - <<PYEOF
+          import pathlib, re, sys
+          p = pathlib.Path("README.md")
+          t = p.read_text()
+          marker = "### GTM Gallery Status"
+          new_block = """$LINE"""
+          if marker in t:
+              t = re.sub(r"### GTM Gallery Status\n[^#\n]*(?:\n)?", new_block + "\n", t, count=1)
+          else:
+              t = t.rstrip("\n") + "\n\n" + new_block + "\n"
+          p.write_text(t)
+          PYEOF
+
+      - name: Commit badge update
+        run: |
+          if [[ -n $(git status --porcelain README.md) ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add README.md
+            git commit -m "chore: update GTM Gallery status badge"
+            git push
+          fi
