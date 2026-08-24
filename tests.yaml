@@ -1,0 +1,3 @@
+# Mirror of the ___TESTS___ section in template.tpl (Stape GTMS-5).
+# Keep both in sync; add scenarios here as the template matures.
+scenarios: []

@@ -76,6 +76,13 @@ The variable follows the consent state supplied by the site's CMP via GTM
 Consent Mode (`setDefaultConsentState` / `updateConsentState`). It renders no
 consent UI; ClickTrail is not a Consent Management Platform.
 
+## Repository structure
+
+Follows the [Stape GTM standards](https://github.com/stape-io/gtm-standards)
+(GTMS-4/5): the readable template code lives in [`template.js`](template.js)
+and is mirrored inside `template.tpl`; `tests.yaml` mirrors the `___TESTS___`
+section. Keep both files in sync on every change.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
