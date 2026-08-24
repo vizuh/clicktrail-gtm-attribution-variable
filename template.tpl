@@ -9,16 +9,21 @@ Google may provide), as modified from time to time.
 ___INFO___
 
 {
-  "type": "MACRO",
-  "id": "ct_attr",
-  "version": 1,
-  "securityGroups": [],
   "displayName": "ClickTrail Attribution",
+  "description": "Returns a structured ClickTrail attribution object: UTMs, ad click IDs (gclid, gbraid, wbraid, fbclid, msclkid and more), initial landing page, initial referrer, and first-touch / last-touch timestamps with deterministic merge rules.",
   "categories": [
     "ADVERTISING",
     "ANALYTICS"
   ],
-  "description": "Returns a structured ClickTrail attribution object: UTMs, ad click IDs (gclid, gbraid, wbraid, fbclid, msclkid and more), initial landing page, initial referrer, and first-touch / last-touch timestamps with deterministic merge rules.",
+  "securityGroups": [],
+  "id": "ct_attr",
+  "type": "MACRO",
+  "version": 1,
+  "brand": {
+    "thumbnail": "",
+    "displayName": "",
+    "id": "brand_clicktrail"
+  },
   "containerContexts": [
     "WEB"
   ]
@@ -26,7 +31,6 @@ ___INFO___
 
 
 ___TEMPLATE_PARAMETERS___
-
 
 [
   {
@@ -54,6 +58,110 @@ ___TEMPLATE_PARAMETERS___
   }
 ]
 
+
+___WEB_PERMISSIONS___
+
+[
+  {
+    "instance": {
+      "key": {
+        "publicId": "access_local_storage",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keys",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "clicktrail_attribution"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "get_url",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "urlParts",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        },
+        {
+          "key": "queriesAllowed",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "logging",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "environments",
+          "value": {
+            "type": 1,
+            "string": "debug"
+          }
+        }
+      ]
+    },
+    "isRequired": true
+  }
+]
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
@@ -224,111 +332,6 @@ return {
   last: last
 };
 
-
-
-___WEB_PERMISSIONS___
-
-[
-  {
-    "instance": {
-      "key": {
-        "publicId": "access_local_storage",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "keys",
-          "value": {
-            "type": 2,
-            "listItem": [
-              {
-                "type": 3,
-                "mapKey": [
-                  {
-                    "type": 1,
-                    "string": "key"
-                  },
-                  {
-                    "type": 1,
-                    "string": "read"
-                  },
-                  {
-                    "type": 1,
-                    "string": "write"
-                  }
-                ],
-                "mapValue": [
-                  {
-                    "type": 1,
-                    "string": "clicktrail_attribution"
-                  },
-                  {
-                    "type": 8,
-                    "boolean": true
-                  },
-                  {
-                    "type": 8,
-                    "boolean": true
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
-        "publicId": "get_url",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "urlParts",
-          "value": {
-            "type": 1,
-            "string": "any"
-          }
-        },
-        {
-          "key": "queriesAllowed",
-          "value": {
-            "type": 1,
-            "string": "any"
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
-        "publicId": "logging",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "environments",
-          "value": {
-            "type": 1,
-            "string": "debug"
-          }
-        }
-      ]
-    },
-    "isRequired": true
-  }
-]
 
 ___TESTS___
 
