@@ -1,11 +1,14 @@
 # clicktrail-gtm-attribution-variable
 
 [ClickTrail](https://wordpress.org/plugins/click-trail-handler/) Attribution
-Variable for Google Tag Manager — a [Community Template Gallery][gallery]
+Variable for Google Tag Manager. This is a [Community Template Gallery][gallery]
 submission.
 
-Returns a structured attribution object built from the current page URL plus
-persisted first-touch state:
+**Expose observed acquisition context inside GTM.**
+
+The variable reads the current page URL plus persisted first-touch and
+last-touch state, then returns a structured object. It does not decide which
+campaign caused a conversion, send events, or configure destination tags.
 
 ```js
 {
@@ -39,7 +42,7 @@ Consent Mode is active, storage access is gated by consent automatically;
 refused reads/writes degrade to in-memory results.
 
 Channel classification (paid search vs organic social vs …) is intentionally
-**not** reimplemented here — channel labels come from the ClickTrail engine,
+**not** reimplemented here. Channel labels come from the ClickTrail engine,
 stamped with `classifier_version`, so rules never diverge between surfaces.
 
 ## Parameters
@@ -85,7 +88,7 @@ section. Keep both files in sync on every change.
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0; see [LICENSE](LICENSE).
 
 ### GTM Gallery Status
 ⚪ Not listed yet
