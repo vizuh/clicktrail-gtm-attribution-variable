@@ -1,8 +1,9 @@
 # clicktrail-gtm-attribution-variable
 
-[ClickTrail](https://wordpress.org/plugins/click-trail-handler/) Attribution
-Variable for Google Tag Manager — a [Community Template Gallery][gallery]
-submission.
+> **ClickTrail is the open-source attribution handoff layer that keeps observed acquisition context attached to conversion records inside the stack you own.**
+
+This template exposes that handoff to a site-owned Google Tag Manager
+`dataLayer`; it does not turn GTM into a hosted analytics service.
 
 Returns a structured attribution object built from the current page URL plus
 persisted first-touch state:
