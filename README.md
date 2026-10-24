@@ -55,6 +55,29 @@ stamped with `classifier_version`, so rules never diverge between surfaces.
 Pair with [`clicktrail-gtm-event-tag`](https://github.com/vizuh/clicktrail-gtm-event-tag):
 set its *Attribution Object* parameter to `{{ClickTrail Attribution}}`.
 
+## Mapping into GA4 tags: reserved field names
+
+When you pass fields from this variable into GA4 Event tag parameters, name
+the parameters yourself (for example `ct_first_source`) and **never use a
+Google tag field name as the parameter name**:
+
+`session_id`, `client_id`, `user_id`, `session_number`,
+`engagement_time_msec`, `timestamp_micros`, `page_location`, `page_referrer`.
+
+The Google tag reads these as its own fields, not as custom parameters. A
+`page_location` parameter that carries `initial_landing_page` replaces the
+page URL of the hit. A `session_id` parameter overrides GA4's session (`sid`)
+and the `_ga_<property>` cookie, so GA4 reports sessions without
+`session_start` and conversions land in Unassigned.
+
+If a catch-all GA4 Event tag (event name `{{Event}}` on every non-`gtm.*`
+event) runs next to ClickTrail, exclude ClickTrail's own pushes:
+`{{Event}}` does not match RegEx `^(gtm\..*|clicktrail|ct_page_view)$`. The
+Google tag already sends `page_view`, and forwarding ClickTrail's page views
+as well counts each navigation more than once.
+
+Background: [vizuh/clicktrail-js#48](https://github.com/vizuh/clicktrail-js/issues/48).
+
 ## Install & submit
 
 1. In Google Tag Manager: **Templates → Variable Templates → New → ⋮ → Import**
