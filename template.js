@@ -17,51 +17,100 @@
  */
 
 const getUrl = require('getUrl');
+const getTimestampMillis = require('getTimestampMillis');
 const localStorage = require('localStorage');
 const log = require('logToConsole');
 const JSON = require('JSON');
+const Math = require('Math');
+const parseUrl = require('parseUrl');
 
 const STORAGE_KEY = 'clicktrail_attribution';
 const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id'];
 const CLICK_IDS = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'ttclid', 'twclid', 'li_fat_id', 'sccid', 'epik'];
 
 /* --- read current URL signals ---------------------------------------- */
-let query = {};
-try {
-  query = getUrl('QUERY', undefined, UTM_KEYS.concat(CLICK_IDS)) || {};
-} catch (e) {
-  /* permission unavailable at runtime; treat as no signals */
-}
-
+/* getUrl(component, stripWww, defaultPages, queryKey): with a queryKey the
+ * 'query' component returns that single parameter's value. */
 function pick(key) {
-  const v = query[key];
-  return v === undefined || v === '' ? undefined : v;
+  let v;
+  try {
+    v = getUrl('query', false, null, key);
+  } catch (e) {
+    /* permission unavailable at runtime; treat as no signal */
+    return undefined;
+  }
+  return typeof v === 'string' && v !== '' ? v : undefined;
 }
 
+function pad(n, width) {
+  let s = '' + n;
+  while (s.length < width) s = '0' + s;
+  return s;
+}
+
+/* Date is not available in the sandbox: format getTimestampMillis() as
+ * ISO-8601 UTC with milliseconds (civil-from-days, H. Hinnant). */
 function nowIso() {
-  return new Date().toISOString();
+  const ms = getTimestampMillis();
+  const days = Math.floor(ms / 86400000);
+  let rest = ms - days * 86400000;
+  const z = days + 719468;
+  const era = Math.floor(z / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor(
+    (doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365
+  );
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const day = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const month = mp < 10 ? mp + 3 : mp - 9;
+  const year = era * 400 + yoe + (month <= 2 ? 1 : 0);
+  const hh = Math.floor(rest / 3600000);
+  rest = rest - hh * 3600000;
+  const mm = Math.floor(rest / 60000);
+  rest = rest - mm * 60000;
+  const ss = Math.floor(rest / 1000);
+  const msPart = rest - ss * 1000;
+  return (
+    pad(year, 4) + '-' + pad(month, 2) + '-' + pad(day, 2) + 'T' +
+    pad(hh, 2) + ':' + pad(mm, 2) + ':' + pad(ss, 2) + '.' + pad(msPart, 3) + 'Z'
+  );
 }
 
+function bareHost(host) {
+  const h = host.toLowerCase().split(':')[0];
+  return h.indexOf('www.') === 0 ? h.substring(4) : h;
+}
+
+/* Internal when the referrer's hostname equals the page hostname (ignoring
+ * scheme, path, port, case and a leading www.). Unparseable referrers are
+ * not treated as an external signal. */
 function hostMatchesReferrer(referrer) {
   if (!referrer) return true;
   let host = '';
   try {
-    host = getUrl('HOST') || '';
+    host = getUrl('host', true) || '';
   } catch (e) {
     return true;
   }
-  return referrer.indexOf(host) >= 0;
+  const parsed = parseUrl(referrer);
+  if (!host || !parsed || !parsed.hostname) return true;
+  return bareHost(parsed.hostname) === bareHost(host);
 }
 
 const referrer =
   typeof data.referrerInput === 'string' && data.referrerInput ? data.referrerInput : undefined;
 
+/* Query string and fragment are dropped before persisting: they can carry
+ * personal data and the attribution parameters are stored separately. */
 const landingPage = (function () {
+  let href;
   try {
-    return getUrl('URL');
+    href = getUrl('url');
   } catch (e) {
     return undefined;
   }
+  return typeof href === 'string' ? href.split('#')[0].split('?')[0] : undefined;
 })();
 
 const utm = {};
